@@ -3,6 +3,19 @@ module FFTW (
     fftwFree,
     fftwAllocReal,
     fftwAllocComplex,
+
+    fftwForward,
+    fftwBackward,
+    fftwMeasure,
+    fftwDestroyInput,
+    fftwUnaligned,
+    fftwConserveMemory,
+    fftwExhaustive,
+    fftwPreserveInput,
+    fftwPatient,
+    fftwEstimate,
+    fftwWisdomOnly,
+
     FFTWPlan,
     planDFT1d,
     planDFTR2C1d,
@@ -14,6 +27,8 @@ import Foreign.Ptr
 import Data.Word
 import Data.Complex
 import Control.Monad
+
+#include <fftw3.h>
 
 foreign import ccall unsafe "fftw_malloc" 
     c_fftwMalloc :: CUInt -> IO (Ptr a)
@@ -35,6 +50,21 @@ foreign import ccall unsafe "fftw_alloc_complex"
 
 fftwAllocComplex :: Word32 -> IO (Ptr (Complex CDouble))
 fftwAllocComplex = c_fftwAllocComplex . fromIntegral
+
+fftwForward, fftwBackward :: Int
+fftwForward        = #const FFTW_FORWARD
+fftwBackward       = #const FFTW_BACKWARD
+
+fftwMeasure, fftwDestroyInput, fftwUnaligned, fftwConserveMemory, fftwExhaustive, fftwPreserveInput, fftwPatient, fftwEstimate, fftwWisdomOnly :: Word32
+fftwMeasure        = #const FFTW_MEASURE
+fftwDestroyInput   = #const FFTW_DESTROY_INPUT
+fftwUnaligned      = #const FFTW_UNALIGNED
+fftwConserveMemory = #const FFTW_CONSERVE_MEMORY
+fftwExhaustive     = #const FFTW_EXHAUSTIVE
+fftwPreserveInput  = #const FFTW_PRESERVE_INPUT
+fftwPatient        = #const FFTW_PATIENT
+fftwEstimate       = #const FFTW_ESTIMATE
+fftwWisdomOnly     = #const FFTW_WISDOM_ONLY
 
 data CFFTWPlan
 newtype FFTWPlan = FFTWPlan (Ptr CFFTWPlan)
