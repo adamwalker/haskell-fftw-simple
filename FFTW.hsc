@@ -1,6 +1,7 @@
 module FFTW (
     fftwMalloc,
     fftwFree,
+    fftwFreePtr,
     fftwAllocReal,
     fftwAllocComplex,
 
@@ -38,6 +39,9 @@ fftwMalloc = c_fftwMalloc . fromIntegral
 
 foreign import ccall unsafe "fftw_free"
     fftwFree :: Ptr a -> IO ()
+
+foreign import ccall unsafe "&fftw_free"
+    fftwFreePtr :: FunPtr (Ptr a -> IO ())
 
 foreign import ccall unsafe "fftw_alloc_real"
     c_fftwAllocReal :: CUInt -> IO (Ptr CDouble)
