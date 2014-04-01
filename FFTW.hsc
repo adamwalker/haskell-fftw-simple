@@ -87,3 +87,15 @@ foreign import ccall unsafe "fftw_execute"
 execute :: FFTWPlan -> IO ()
 execute (FFTWPlan p) = c_execute p
 
+foreign import ccall unsafe "fftw_execute_dft"
+    c_executeDFT :: Ptr CFFTWPlan -> Ptr (Complex CDouble) -> Ptr (Complex CDouble) -> IO ()
+
+executeDFT :: FFTWPlan -> Ptr (Complex CDouble) -> Ptr (Complex CDouble) -> IO ()
+executeDFT (FFTWPlan p) inp out = c_executeDFT p inp out
+
+foreign import ccall unsafe "fftw_execute_dft_r2c"
+    c_executeDFTR2C :: Ptr CFFTWPlan -> Ptr CDouble -> Ptr (Complex CDouble) -> IO ()
+
+executeDFTR2C :: FFTWPlan -> Ptr CDouble -> Ptr (Complex CDouble) -> IO ()
+executeDFTR2C (FFTWPlan p) inp out = c_executeDFTR2C p inp out
+
