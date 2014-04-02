@@ -20,7 +20,9 @@ module FFTW (
     FFTWPlan,
     planDFT1d,
     planDFTR2C1d,
-    execute
+    execute,
+    executeDFT,
+    executeDFTR2C
     ) where
 
 import Foreign.C.Types
