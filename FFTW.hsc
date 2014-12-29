@@ -78,12 +78,14 @@ newtype FFTWPlan = FFTWPlan (Ptr CFFTWPlan)
 foreign import ccall unsafe "fftw_plan_dft_1d"
     c_planDFT1d :: CInt -> Ptr (Complex CDouble) -> Ptr (Complex CDouble) -> CInt -> CUInt -> IO (Ptr CFFTWPlan)
 
+--This appears to be missing from the fft package on Hackage
 planDFT1d :: Int -> Ptr (Complex CDouble) -> Ptr (Complex CDouble) -> Int -> Word32 -> IO FFTWPlan
 planDFT1d n inp out sign flags = liftM FFTWPlan $ c_planDFT1d (fromIntegral n) inp out (fromIntegral sign) (fromIntegral flags)
 
 foreign import ccall unsafe "fftw_plan_dft_r2c_1d"
     c_planDFTR2C1d :: CInt -> Ptr CDouble -> Ptr (Complex CDouble) -> CUInt -> IO (Ptr CFFTWPlan)
 
+--This appears to be missing from the fft package on Hackage
 planDFTR2C1d :: Int -> Ptr CDouble -> Ptr (Complex CDouble) -> Word32 -> IO FFTWPlan
 planDFTR2C1d n inp out flags = liftM FFTWPlan $ c_planDFTR2C1d (fromIntegral n) inp out (fromIntegral flags)
 
