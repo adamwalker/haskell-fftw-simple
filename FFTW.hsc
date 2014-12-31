@@ -10,7 +10,6 @@ module FFTW (
     fftwMeasure,
     fftwDestroyInput,
     fftwUnaligned,
-    fftwConserveMemory,
     fftwExhaustive,
     fftwPreserveInput,
     fftwPatient,
@@ -64,16 +63,19 @@ dirToInt :: Direction -> CInt
 dirToInt Forward  = #const FFTW_FORWARD
 dirToInt Backward = #const FFTW_BACKWARD
 
-fftwMeasure, fftwDestroyInput, fftwUnaligned, fftwConserveMemory, fftwExhaustive, fftwPreserveInput, fftwPatient, fftwEstimate, fftwWisdomOnly :: Word32
+--Planning rigor flags
+fftwMeasure, fftwExhaustive, fftwPatient, fftwEstimate, fftwWisdomOnly :: Word32
+fftwEstimate       = #const FFTW_ESTIMATE
 fftwMeasure        = #const FFTW_MEASURE
+fftwPatient        = #const FFTW_PATIENT
+fftwExhaustive     = #const FFTW_EXHAUSTIVE
+fftwWisdomOnly     = #const FFTW_WISDOM_ONLY
+
+--Algorithm restriction flags
+fftwDestroyInput, fftwUnaligned, fftwPreserveInput :: Word32
 fftwDestroyInput   = #const FFTW_DESTROY_INPUT
 fftwUnaligned      = #const FFTW_UNALIGNED
-fftwConserveMemory = #const FFTW_CONSERVE_MEMORY
-fftwExhaustive     = #const FFTW_EXHAUSTIVE
 fftwPreserveInput  = #const FFTW_PRESERVE_INPUT
-fftwPatient        = #const FFTW_PATIENT
-fftwEstimate       = #const FFTW_ESTIMATE
-fftwWisdomOnly     = #const FFTW_WISDOM_ONLY
 
 data CFFTWPlan
 newtype FFTWPlan i o = FFTWPlan (Ptr CFFTWPlan)
