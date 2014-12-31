@@ -29,6 +29,8 @@ import Foreign.Ptr
 import Data.Word
 import Data.Complex
 import Control.Monad
+import Data.Bits
+import Data.Monoid
 
 #include <fftw3.h>
 
@@ -63,19 +65,25 @@ dirToInt :: Direction -> CInt
 dirToInt Forward  = #const FFTW_FORWARD
 dirToInt Backward = #const FFTW_BACKWARD
 
+newtype Flag = Flag {unFlag :: CUInt}
+
+instance Monoid Flag where
+    mempty                    = Flag 0
+    mappend (Flag x) (Flag y) = Flag (x .|. y)
+
 --Planning rigor flags
-fftwMeasure, fftwExhaustive, fftwPatient, fftwEstimate, fftwWisdomOnly :: Word32
-fftwEstimate       = #const FFTW_ESTIMATE
-fftwMeasure        = #const FFTW_MEASURE
-fftwPatient        = #const FFTW_PATIENT
-fftwExhaustive     = #const FFTW_EXHAUSTIVE
-fftwWisdomOnly     = #const FFTW_WISDOM_ONLY
+fftwMeasure, fftwExhaustive, fftwPatient, fftwEstimate, fftwWisdomOnly :: Flag
+fftwEstimate       = Flag #const FFTW_ESTIMATE
+fftwMeasure        = Flag #const FFTW_MEASURE
+fftwPatient        = Flag #const FFTW_PATIENT
+fftwExhaustive     = Flag #const FFTW_EXHAUSTIVE
+fftwWisdomOnly     = Flag #const FFTW_WISDOM_ONLY
 
 --Algorithm restriction flags
-fftwDestroyInput, fftwUnaligned, fftwPreserveInput :: Word32
-fftwDestroyInput   = #const FFTW_DESTROY_INPUT
-fftwUnaligned      = #const FFTW_UNALIGNED
-fftwPreserveInput  = #const FFTW_PRESERVE_INPUT
+fftwDestroyInput, fftwUnaligned, fftwPreserveInput :: Flag
+fftwDestroyInput   = Flag #const FFTW_DESTROY_INPUT
+fftwUnaligned      = Flag #const FFTW_UNALIGNED
+fftwPreserveInput  = Flag #const FFTW_PRESERVE_INPUT
 
 data CFFTWPlan
 newtype FFTWPlan i o = FFTWPlan (Ptr CFFTWPlan)
@@ -84,15 +92,15 @@ foreign import ccall unsafe "fftw_plan_dft_1d"
     c_planDFT1d :: CInt -> Ptr (Complex CDouble) -> Ptr (Complex CDouble) -> CInt -> CUInt -> IO (Ptr CFFTWPlan)
 
 --This appears to be missing from the fft package on Hackage
-planDFT1d :: Int -> Ptr (Complex CDouble) -> Ptr (Complex CDouble) -> Direction -> Word32 -> IO (FFTWPlan (Complex CDouble) (Complex CDouble))
-planDFT1d n inp out sign flags = liftM FFTWPlan $ c_planDFT1d (fromIntegral n) inp out (dirToInt sign) (fromIntegral flags)
+planDFT1d :: Int -> Ptr (Complex CDouble) -> Ptr (Complex CDouble) -> Direction -> Flag -> IO (FFTWPlan (Complex CDouble) (Complex CDouble))
+planDFT1d n inp out sign flags = liftM FFTWPlan $ c_planDFT1d (fromIntegral n) inp out (dirToInt sign) (unFlag flags)
 
 foreign import ccall unsafe "fftw_plan_dft_r2c_1d"
     c_planDFTR2C1d :: CInt -> Ptr CDouble -> Ptr (Complex CDouble) -> CUInt -> IO (Ptr CFFTWPlan)
 
 --This appears to be missing from the fft package on Hackage
-planDFTR2C1d :: Int -> Ptr CDouble -> Ptr (Complex CDouble) -> Word32 -> IO (FFTWPlan CDouble (Complex CDouble))
-planDFTR2C1d n inp out flags = liftM FFTWPlan $ c_planDFTR2C1d (fromIntegral n) inp out (fromIntegral flags)
+planDFTR2C1d :: Int -> Ptr CDouble -> Ptr (Complex CDouble) -> Flag -> IO (FFTWPlan CDouble (Complex CDouble))
+planDFTR2C1d n inp out flags = liftM FFTWPlan $ c_planDFTR2C1d (fromIntegral n) inp out (unFlag flags)
 
 foreign import ccall unsafe "fftw_execute"
     c_execute :: Ptr CFFTWPlan -> IO ()
