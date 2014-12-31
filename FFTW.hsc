@@ -73,37 +73,37 @@ fftwEstimate       = #const FFTW_ESTIMATE
 fftwWisdomOnly     = #const FFTW_WISDOM_ONLY
 
 data CFFTWPlan
-newtype FFTWPlan = FFTWPlan (Ptr CFFTWPlan)
+newtype FFTWPlan i o = FFTWPlan (Ptr CFFTWPlan)
 
 foreign import ccall unsafe "fftw_plan_dft_1d"
     c_planDFT1d :: CInt -> Ptr (Complex CDouble) -> Ptr (Complex CDouble) -> CInt -> CUInt -> IO (Ptr CFFTWPlan)
 
 --This appears to be missing from the fft package on Hackage
-planDFT1d :: Int -> Ptr (Complex CDouble) -> Ptr (Complex CDouble) -> Int -> Word32 -> IO FFTWPlan
+planDFT1d :: Int -> Ptr (Complex CDouble) -> Ptr (Complex CDouble) -> Int -> Word32 -> IO (FFTWPlan (Complex CDouble) (Complex CDouble))
 planDFT1d n inp out sign flags = liftM FFTWPlan $ c_planDFT1d (fromIntegral n) inp out (fromIntegral sign) (fromIntegral flags)
 
 foreign import ccall unsafe "fftw_plan_dft_r2c_1d"
     c_planDFTR2C1d :: CInt -> Ptr CDouble -> Ptr (Complex CDouble) -> CUInt -> IO (Ptr CFFTWPlan)
 
 --This appears to be missing from the fft package on Hackage
-planDFTR2C1d :: Int -> Ptr CDouble -> Ptr (Complex CDouble) -> Word32 -> IO FFTWPlan
+planDFTR2C1d :: Int -> Ptr CDouble -> Ptr (Complex CDouble) -> Word32 -> IO (FFTWPlan CDouble (Complex CDouble))
 planDFTR2C1d n inp out flags = liftM FFTWPlan $ c_planDFTR2C1d (fromIntegral n) inp out (fromIntegral flags)
 
 foreign import ccall unsafe "fftw_execute"
     c_execute :: Ptr CFFTWPlan -> IO ()
 
-execute :: FFTWPlan -> IO ()
+execute :: FFTWPlan i o -> IO ()
 execute (FFTWPlan p) = c_execute p
 
 foreign import ccall unsafe "fftw_execute_dft"
     c_executeDFT :: Ptr CFFTWPlan -> Ptr (Complex CDouble) -> Ptr (Complex CDouble) -> IO ()
 
-executeDFT :: FFTWPlan -> Ptr (Complex CDouble) -> Ptr (Complex CDouble) -> IO ()
+executeDFT :: FFTWPlan (Complex CDouble) (Complex CDouble) -> Ptr (Complex CDouble) -> Ptr (Complex CDouble) -> IO ()
 executeDFT (FFTWPlan p) inp out = c_executeDFT p inp out
 
 foreign import ccall unsafe "fftw_execute_dft_r2c"
     c_executeDFTR2C :: Ptr CFFTWPlan -> Ptr CDouble -> Ptr (Complex CDouble) -> IO ()
 
-executeDFTR2C :: FFTWPlan -> Ptr CDouble -> Ptr (Complex CDouble) -> IO ()
+executeDFTR2C :: FFTWPlan CDouble (Complex CDouble) -> Ptr CDouble -> Ptr (Complex CDouble) -> IO ()
 executeDFTR2C (FFTWPlan p) inp out = c_executeDFTR2C p inp out
 
