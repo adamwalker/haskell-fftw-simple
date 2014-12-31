@@ -5,8 +5,8 @@ module FFTW (
     fftwAllocReal,
     fftwAllocComplex,
 
-    fftwForward,
-    fftwBackward,
+    Direction(..),
+
     fftwMeasure,
     fftwDestroyInput,
     fftwUnaligned,
@@ -57,9 +57,12 @@ foreign import ccall unsafe "fftw_alloc_complex"
 fftwAllocComplex :: Word32 -> IO (Ptr (Complex CDouble))
 fftwAllocComplex = c_fftwAllocComplex . fromIntegral
 
-fftwForward, fftwBackward :: Int
-fftwForward        = #const FFTW_FORWARD
-fftwBackward       = #const FFTW_BACKWARD
+data Direction = Forward
+               | Backward
+
+dirToInt :: Direction -> CInt
+dirToInt Forward  = #const FFTW_FORWARD
+dirToInt Backward = #const FFTW_BACKWARD
 
 fftwMeasure, fftwDestroyInput, fftwUnaligned, fftwConserveMemory, fftwExhaustive, fftwPreserveInput, fftwPatient, fftwEstimate, fftwWisdomOnly :: Word32
 fftwMeasure        = #const FFTW_MEASURE
@@ -79,8 +82,8 @@ foreign import ccall unsafe "fftw_plan_dft_1d"
     c_planDFT1d :: CInt -> Ptr (Complex CDouble) -> Ptr (Complex CDouble) -> CInt -> CUInt -> IO (Ptr CFFTWPlan)
 
 --This appears to be missing from the fft package on Hackage
-planDFT1d :: Int -> Ptr (Complex CDouble) -> Ptr (Complex CDouble) -> Int -> Word32 -> IO (FFTWPlan (Complex CDouble) (Complex CDouble))
-planDFT1d n inp out sign flags = liftM FFTWPlan $ c_planDFT1d (fromIntegral n) inp out (fromIntegral sign) (fromIntegral flags)
+planDFT1d :: Int -> Ptr (Complex CDouble) -> Ptr (Complex CDouble) -> Direction -> Word32 -> IO (FFTWPlan (Complex CDouble) (Complex CDouble))
+planDFT1d n inp out sign flags = liftM FFTWPlan $ c_planDFT1d (fromIntegral n) inp out (dirToInt sign) (fromIntegral flags)
 
 foreign import ccall unsafe "fftw_plan_dft_r2c_1d"
     c_planDFTR2C1d :: CInt -> Ptr CDouble -> Ptr (Complex CDouble) -> CUInt -> IO (Ptr CFFTWPlan)
