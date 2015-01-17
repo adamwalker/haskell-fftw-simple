@@ -4,7 +4,10 @@
 name:                fftw
 version:             0.1.0.0
 synopsis:            Low level bindings to FFTW.
-description:         Low level bindings to FFTW, the Fastest Fourier Transform in the West.
+description:         
+    Low level bindings to FFTW, the Fastest Fourier Transform in the West.
+    .
+    Bindings are only written for a small subset of FFTW's functionality. Raise an Issue on Github if you need something I haven't implemented.
 license:             BSD3
 license-file:        LICENSE
 author:              Adam Walker
