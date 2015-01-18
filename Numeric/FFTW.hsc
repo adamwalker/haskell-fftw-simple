@@ -23,7 +23,7 @@ Example usage:
 >     print res
 -}
 
-module FFTW (
+module Numeric.FFTW (
     fftwMalloc,
     fftwFree,
     fftwFreePtr,
