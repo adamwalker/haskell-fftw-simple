@@ -2,7 +2,7 @@ name:                fftwRaw
 version:             0.1.0.0
 synopsis:            Low level bindings to FFTW.
 description:         
-    Yet another set of Haskell bindings to FFTW, the Fastest Fourier Transform in the West.
+    Yet another set of Haskell bindings to <http://www.fftw.org/ FFTW>, the Fastest Fourier Transform in the West.
     .
     These are low level bindings with some type safety for a small subset of FFTW's functionality. Raise an Issue on Github if you need something I haven't implemented.
     .
