@@ -63,6 +63,7 @@ import Data.Complex
 import Control.Monad
 import Data.Bits
 import Data.Monoid
+import Data.Semigroup as Sem
 
 #include <fftw3.h>
 
@@ -110,9 +111,14 @@ dirToInt Backward = #const FFTW_BACKWARD
 -- | FFTW planner flags. These flags affect the planning process. They can be combined using the 'Monoid' instance. See the FFTW flag documentation: <http://www.fftw.org/doc/Planner-Flags.html>.
 newtype Flag = Flag {unFlag :: CUInt}
 
+instance Sem.Semigroup Flag where
+  (Flag x) <> (Flag y) = Flag (x .|. y)
+
 instance Monoid Flag where
-    mempty                    = Flag 0
-    mappend (Flag x) (Flag y) = Flag (x .|. y)
+    mempty   = Flag 0
+#if !(MIN_VERSION_base(4,11,0))
+    mappend  = (<>)
+#endif
 
 fftwMeasure, fftwExhaustive, fftwPatient, fftwEstimate, fftwWisdomOnly :: Flag
 fftwEstimate       = Flag #const FFTW_ESTIMATE
