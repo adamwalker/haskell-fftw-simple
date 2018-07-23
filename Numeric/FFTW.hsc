@@ -117,7 +117,7 @@ instance Sem.Semigroup Flag where
 instance Monoid Flag where
     mempty   = Flag 0
 #if !(MIN_VERSION_base(4,11,0))
-    mappend  = (<>)
+    mappend  = (Sem.<>)
 #endif
 
 fftwMeasure, fftwExhaustive, fftwPatient, fftwEstimate, fftwWisdomOnly :: Flag
